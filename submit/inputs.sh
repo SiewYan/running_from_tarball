@@ -1,5 +1,5 @@
-TARBALL=Vector_Zprime_NLO_Mphi-750_Mchi-600_gSM-0p25_gDM-1p0_13TeV-madgraph_tarball.tar.xz
-HADRONIZER=Vector_Zprime_NLO_Mphi-750_Mchi-600_gSM-0p25_gDM-1p0_13TeV-madgraph_hadronizer.py
-PROCESS=Vector_Zprime_NLO_Mphi-750_Mchi-600_gSM-0p25_gDM-1p0_13TeV-madgraph
-USERNAME=shoh
+TARBALL=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz
+HADRONIZER=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30_hadronizer.py
+PROCESS=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30
+USERNAME=hoh
 MERGE=0

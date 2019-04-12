@@ -14,7 +14,7 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
 
-export nevent="100"
+export nevent="10"
 
 # output
 export EOSOUTPUT=${eos_output}
@@ -23,7 +23,7 @@ export EOSOUTPUT=${eos_output}
 #############
 #############
 # make a working area
-
+ 
 echo " Start to work now"
 pwd
 mkdir -p ./work
@@ -71,7 +71,6 @@ ls -lhrt
 # Generate GEN-SIM
 echo "1.) GENERATING GEN-SIM"
 cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
-
 
 #Make each file unique to make later publication possible
 linenumber=`grep -n 'process.source' ${outfilename}_gensim.py | awk '{print $1}'`
@@ -125,7 +124,6 @@ cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfil
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py
 
-
 #
 ###########
 ###########
@@ -139,11 +137,13 @@ tar xf $BASEDIR/inputs/copy.tar
 
 ls -lrht
 
+lcg-cp -v -D srmv2 -b file:///$PWD/${outfilename}_miniaod.root srm://t2-srm-02.lnl.infn.it:8443/srm/managerv2?SFN=/pnfs/lnl.infn.it/data/cms/store/user/shoh/privateSignal/${outfilename}_miniaod.root
+
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${EOSOUTPUT}/${PROCESS}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/BBbarDM_90/${PROCESS}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/shoh/miniaod/BBbarDM_70/${PROCESS}/${outfilename}_miniaod.root
-xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/DiJetsDM/${PROCESS}/${outfilename}_miniaod.root
+#xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/DiJetsDM/${PROCESS}/${outfilename}_miniaod.root
 #if which gfal-copy
 #then
 #    gfal-copy ${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
