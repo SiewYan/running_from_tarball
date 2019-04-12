@@ -3,19 +3,21 @@
 set -e
 
 #GRIDPACK DIR, FULL PATH                                                                                                                                                                                                                     
-dir="/eos/uscms/store/user/shoh/gridpacks/DarkHiggs/BBbarDM"
-export eos_input=`(echo $dir | awk -F "uscms" '{print $2}')`
+dir="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/tarball/"
+#export eos_input=`(echo $dir | awk -F "uscms" '{print $2}')`
 files=`ls $dir`
                         
 #number of job
-njob="2500"
+#njob="2500"
+njob="10"
 
 echo "#!/bin/bash" > multisubmit.sh
 
 for file in $files
 do
 echo "$file"
-xrdcp root://cmseos.fnal.gov//${eos_input}/${file} inputs/
+#xrdcp root://cmseos.fnal.gov//${eos_input}/${file} inputs/
+scp ${dir}/$file inputs/
 
 fbname=$(basename ${file} _tarball.tar.xz)
 

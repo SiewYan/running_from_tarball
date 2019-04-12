@@ -2,11 +2,11 @@
 
 set -e
 
-export TARBALLDIR="/uscms_data/d1/shoh/private_production/running_from_tarball"
+export TARBALLDIR="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/tarball/"
 #+++++++++++++++++++++++++++++++++++++++++++++++
 #Run on one gridpack for testing, please comment this if run in bunches
-export EOSSPACE="/eos/uscms${eos_input}"
-#export EOSSPACE="./inputs"
+#export EOSSPACE="/eos/uscms${eos_input}"
+export EOSSPACE="./inputs"
 #+++++++++++++++++++++++++++++++++++++++++++++++
 export BASEDIR=${PWD}
 if [ -e "work_${1}" ];then

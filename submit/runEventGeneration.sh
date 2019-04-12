@@ -14,7 +14,7 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
 
-export nevent="100"
+export nevent="10"
 
 # output
 export EOSOUTPUT=${eos_output}
@@ -37,6 +37,8 @@ export WORKDIR=`pwd`
 
 export SCRAM_ARCH=slc6_amd64_gcc481
 CMSSWRELEASE=CMSSW_7_1_20_patch3
+#export SCRAM_ARCH=slc6_amd64_gcc630
+#CMSSWRELEASE=CMSSW_9_3_8
 scram p CMSSW $CMSSWRELEASE
 cd $CMSSWRELEASE/src
 mkdir -p Configuration/GenProduction/python/
@@ -139,11 +141,13 @@ tar xf $BASEDIR/inputs/copy.tar
 
 ls -lrht
 
+lcg-cp -v -D srmv2 -b file:///$PWD/${outfilename}_miniaod.root srm://t2-srm-02.lnl.infn.it:8443/srm/managerv2?SFN=/pnfs/lnl.infn.it/data/cms/store/user/shoh/privateSignal/${outfilename}_miniaod.root
+
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${EOSOUTPUT}/${PROCESS}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/BBbarDM_90/${PROCESS}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/shoh/miniaod/BBbarDM_70/${PROCESS}/${outfilename}_miniaod.root
-xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/DiJetsDM/${PROCESS}/${outfilename}_miniaod.root
+#xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/lpcmetx/miniaod/DarkHiggsModel/DiJetsDM/${PROCESS}/${outfilename}_miniaod.root
 #if which gfal-copy
 #then
 #    gfal-copy ${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
