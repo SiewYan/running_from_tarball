@@ -42,37 +42,46 @@ CMSSWRELEASE=CMSSW_7_1_20_patch3
 scram p CMSSW $CMSSWRELEASE
 cd $CMSSWRELEASE/src
 mkdir -p Configuration/GenProduction/python/
-cp ${BASEDIR}/inputs/${HADRONIZER} Configuration/GenProduction/python/
+
+## add externalLHEproducer to hadronizer config
+cat > tempHadronizer <<EOF
+import FWCore.ParameterSet.Config as cms
+externalLHEProducer = cms.EDProducer('ExternalLHEProducer',
+args = cms.vstring('${BASEDIR}/inputs/${TARBALL}'),
+nEvents = cms.untracked.uint32(5000),
+numberOfParameters = cms.uint32(1),
+outputFile = cms.string('${outfilename}.lhe'),
+scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
+)
+EOF
+cat ${BASEDIR}/inputs/${HADRONIZER} >> tempHadronizer
+cp tempHadronizer Configuration/GenProduction/python/${HADRONIZER}
 scram b -j 1
 eval `scram runtime -sh`
 cd -
-
-tar xvaf ${BASEDIR}/inputs/${TARBALL}
-
-sed -i 's/exit 0//g' runcmsgrid.sh
-
-ls -lhrt
-
-RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
-
-#Sometimes the RANDOMSEED is too long for madgraph
-RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
-
-#Run
-. runcmsgrid.sh 500 ${RANDOMSEED} 1
-
-outfilename_tmp="$PROCESS"'_'"$RANDOMSEED"
-outfilename="${outfilename_tmp//[[:space:]]/}"
-
-mv cmsgrid_final.lhe ${outfilename}.lhe
+#mv cmsgrid_final.lhe ${outfilename}.lhe
 
 ls -lhrt
 #
 #############
 #############
 # Generate GEN-SIM
-echo "1.) GENERATING GEN-SIM"
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
+echo "1.) GENERATING LHE-GEN-SIM"
+#cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
+
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} \
+    --fileout file:${outfilename}_gensim.root \
+    --mc \
+    --eventcontent LHE,RAWSIM \
+    --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN,GEN-SIM \
+    --conditions MCRUN2_71_V1::All \
+    --beamspot Realistic50ns13TeVCollision \
+    --step GEN,SIM \
+    --magField 38T_PostLS1 \
+    --python_filename ${outfilename}_gensim.py \
+    --no_exec \
+    -n ${nevent} \
 
 
 #Make each file unique to make later publication possible

@@ -1,10 +1,10 @@
 #!/usr/bin/expect -f
 
-set GRIDPASSWORD "YOURPASSWORD"
+set GRIDPASSWORD "INPUTYOURPASSWORD"
 
 spawn sh buildInputs.sh $argv
 
-expect "Enter GRID pass phrase:"
+expect "Enter GRID pass phrase for this identity:"
 send -- "${GRIDPASSWORD}\r"
 
 expect eof

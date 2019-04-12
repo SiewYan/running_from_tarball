@@ -2,7 +2,7 @@
 
 set -e
 
-export TARBALLDIR="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/tarball/"
+export TARBALLDIR="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/"
 #+++++++++++++++++++++++++++++++++++++++++++++++
 #Run on one gridpack for testing, please comment this if run in bunches
 #export EOSSPACE="/eos/uscms${eos_input}"
