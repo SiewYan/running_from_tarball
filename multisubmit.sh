@@ -1,0 +1,3 @@
+#!/bin/bash
+python submit.py work_Wminushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30 10
+python submit.py work_Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30 10
