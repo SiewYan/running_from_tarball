@@ -3,7 +3,7 @@
 set -e
 
 #GRIDPACK DIR, FULL PATH                                                                                                                                                                                                                     
-dir="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/tarball/"
+dir="${PWD}/tarball/"
 #export eos_input=`(echo $dir | awk -F "uscms" '{print $2}')`
 files=`ls $dir`
                         

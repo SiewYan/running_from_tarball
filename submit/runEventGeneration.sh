@@ -17,7 +17,7 @@ source inputs.sh
 export nevent="10"
 
 # output
-export EOSOUTPUT=${eos_output}
+#export EOSOUTPUT=${eos_output}
 
 #
 #############
@@ -35,8 +35,10 @@ export WORKDIR=`pwd`
 #############
 # generate LHEs
 
-export SCRAM_ARCH=slc6_amd64_gcc481
-CMSSWRELEASE=CMSSW_7_1_20_patch3
+#export SCRAM_ARCH=slc6_amd64_gcc481
+#CMSSWRELEASE=CMSSW_7_1_20_patch3
+export SCRAM_ARCH=slc6_amd64_gcc472
+CMSSWRELEASE=CMSSW_7_1_30
 scram p CMSSW $CMSSWRELEASE
 cd $CMSSWRELEASE/src
 mkdir -p Configuration/GenProduction/python/
@@ -70,7 +72,18 @@ ls -lhrt
 #############
 # Generate GEN-SIM
 echo "1.) GENERATING GEN-SIM"
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} \
+    --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root \
+    --mc \
+    --step GEN,SIM \
+    --eventcontent RAWSIM \
+    --datatier GEN-SIM \
+    --conditions MCRUN2_71_V1::All \
+    --beamspot Realistic50ns13TeVCollision \
+    --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring \
+    --magField 38T_PostLS1 \
+    --python_filename ${outfilename}_gensim.py \
+    --no_exec -n ${nevent}
 
 #Make each file unique to make later publication possible
 linenumber=`grep -n 'process.source' ${outfilename}_gensim.py | awk '{print $1}'`
@@ -84,6 +97,11 @@ echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOMSEED)," >> head.py
 cat tail.py >> head.py
 mv head.py ${outfilename}_gensim.py
 rm -rf tail.py
+
+echo "HERE"
+ls -trlh
+
+cat ${outfilename}_gensim.py
 
 #Run
 cmsRun ${outfilename}_gensim.py
@@ -109,7 +127,19 @@ mv aod_template.py ${outfilename}_1_cfg.py
 
 cmsRun ${outfilename}_1_cfg.py
 echo "2.) GENERATING AOD"
-cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --runUnscheduled --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step RAW2DIGI,RECO,EI --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
+cmsDriver.py step2 \
+    --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root \
+    --mc \
+    --step RAW2DIGI,RECO,EI \
+    --eventcontent AODSIM \
+    --datatier AODSIM \
+    --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
+    --era Run2_2016 \
+    --nThreads 1 \
+    --python_filename ${outfilename}_2_cfg.py \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --runUnscheduled \
+    --no_exec -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_2_cfg.py
@@ -119,7 +149,19 @@ cmsRun ${outfilename}_2_cfg.py
 ###########
 # Generate MiniAODv2
 echo "3.) Generating MINIAOD"
-cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --runUnscheduled --datatier MINIAODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step PAT --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
+cmsDriver.py step1 \
+    --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root \
+    --mc \
+    --step PAT \
+    --eventcontent MINIAODSIM \
+    --datatier MINIAODSIM \
+    --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
+    --era Run2_2016 \
+    --nThreads 1 \
+    --python_filename ${outfilename}_miniaod_cfg.py \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --runUnscheduled \
+    --no_exec -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py
