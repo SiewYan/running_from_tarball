@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f
 
-set GRIDPASSWORD "YOURPASSWORD"
+set GRIDPASSWORD "YOUPWD"
 
 spawn sh buildInputs.sh $argv
 
