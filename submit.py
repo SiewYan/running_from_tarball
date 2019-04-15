@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 from sys import argv
-from os import system,getenv,getuid,getcwd
+from os import system,getenv,getuid,getcwd,environ
 
 logpath=getcwd()+'/logs/'
 workpath=getcwd()+'/'+str(argv[1])
 uid=getuid()
+home=environ['HOME']
 
 njobs = argv[2]
 
@@ -24,18 +25,17 @@ rank = Mips
 RequestMemory = 1968
 arguments = $(Process)                                                                                                                                                                     
 use_x509userproxy = True                                                                                                                                                                        
-x509userproxy = /tmp/x509up_u{2}                                                                                                                                                        
+x509userproxy = {4}/x509up_u{2}                                                                                                                                                        
 #on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)                                                                                                                                      
 +AccountingGroup = "analysis.shoh"  
 +AcctGroup = "analysis"                                                                                                                                                                            
 +ProjectName = "PrivateSim" 
 queue {3}  
-'''.format(workpath,logpath,uid,njobs)
+'''.format(workpath,logpath,uid,njobs,home)
 
 with open(logpath+'/condor.jdl','w') as jdlfile:
   jdlfile.write(classad)
-
-system('condor_submit %s/condor.jdl'%logpath)
-
+  
+  system('condor_submit %s/condor.jdl'%logpath)
 
 #RequestMemory = 3000 

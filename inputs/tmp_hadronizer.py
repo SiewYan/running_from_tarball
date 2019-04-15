@@ -1,3 +1,4 @@
+#Hadronizer_TuneCUEP8M1_13TeV_LHE_pythia8_cff.py
 import FWCore.ParameterSet.Config as cms
 from Configuration.Generator.Pythia8CommonSettings_cfi import *
 from Configuration.Generator.Pythia8CUEP8M1Settings_cfi import *
@@ -11,8 +12,15 @@ generator = cms.EDFilter("Pythia8HadronizerFilter",
                          PythiaParameters = cms.PSet(
         pythia8CommonSettingsBlock,
         pythia8CUEP8M1SettingsBlock,
+        processParameters = cms.vstring(
+            'SLHA:useDecayTable = off',  # Use pythia8s own decay mode instead of decays defined in LH accord
+            '25:m0 = 125.0',
+            '25:onMode = off',
+            '25:onIfMatch = 5 -5'
+            ),
         parameterSets = cms.vstring('pythia8CommonSettings',
-                                    'pythia8CUEP8M1Settings'
+                                    'pythia8CUEP8M1Settings',
+                                    'processParameters'
                                     )
         )
                          )

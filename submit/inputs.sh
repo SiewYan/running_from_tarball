@@ -1,5 +1,5 @@
 TARBALL=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz
 HADRONIZER=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30_hadronizer.py
 PROCESS=Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30
-USERNAME=hoh
+USERNAME=shoh
 MERGE=0

@@ -3,13 +3,12 @@
 set -e
 
 #GRIDPACK DIR, FULL PATH                                                                                                                                                                                                                     
-dir="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/tarball/"
+dir="${PWD}/tarball/"
 #export eos_input=`(echo $dir | awk -F "uscms" '{print $2}')`
 files=`ls $dir`
                         
 #number of job
-#njob="2500"
-njob="10"
+njob="30"
 
 echo "#!/bin/bash" > multisubmit.sh
 
@@ -17,10 +16,10 @@ for file in $files
 do
     echo "$file"
     #xrdcp root://cmseos.fnal.gov//${eos_input}/${file} inputs/
-    scp ${dir}/$file inputs/
-
+    scp ${dir}/${file} inputs/
+    
     fbname=$(basename ${file} _tarball.tar.xz)
-
+    
     scp inputs/tmp_hadronizer.py inputs/${fbname}_hadronizer.py
     echo "./auto ${fbname}"
     ./auto ${fbname}

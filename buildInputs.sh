@@ -2,7 +2,11 @@
 
 set -e
 
+<<<<<<< HEAD
 export TARBALLDIR="/lustre/cmswork/hoh/NANO/PrivateSignal/running_from_tarball/"
+=======
+export TARBALLDIR=$PWD
+>>>>>>> 0a37da81ac21b5bb2e92b7e68c57025811fa939f
 #+++++++++++++++++++++++++++++++++++++++++++++++
 #Run on one gridpack for testing, please comment this if run in bunches
 #export EOSSPACE="/eos/uscms${eos_input}"
@@ -39,7 +43,7 @@ cp inputs/pu_files.py ./submit/inputs/
 
 #x509
 voms-proxy-init -voms cms -valid 172:00
-cp /tmp/x509up_u$UID $SUBMIT_WORKDIR/x509up
+cp ~/x509up_u$UID $SUBMIT_WORKDIR/x509up
 
 #creating tarball
 echo "Tarring up submit..."
