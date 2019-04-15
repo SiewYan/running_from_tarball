@@ -14,7 +14,7 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
 
-export nevent="10"
+export nevent="1000"
 
 # output
 #export EOSOUTPUT=${eos_output}
@@ -110,22 +110,44 @@ cmsRun ${outfilename}_gensim.py
 ############
 ############
 # Generate AOD
-
 export SCRAM_ARCH=slc6_amd64_gcc530
-scram p CMSSW CMSSW_8_0_21
+if [ -r CMSSW_8_0_21/src ] ; then 
+    echo release CMSSW_8_0_21 already exists
+else
+    scram p CMSSW CMSSW_8_0_21
+fi
 cd CMSSW_8_0_21/src
 eval `scram runtime -sh`
+scram b -j 1
 cd -
 
-cp ${BASEDIR}/inputs/pu_files.py .
-cp ${BASEDIR}/inputs/aod_template.py .
+#cp ${BASEDIR}/inputs/pu_files.py .
+#cp ${BASEDIR}/inputs/aod_template.py .
 
-sed -i 's/XX-GENSIM-XX/'${outfilename}'/g' aod_template.py
-sed -i 's/XX-AODFILE-XX/'${outfilename}'/g' aod_template.py
+#sed -i 's/XX-GENSIM-XX/'${outfilename}'/g' aod_template.py
+#sed -i 's/XX-AODFILE-XX/'${outfilename}'/g' aod_template.py
 
-mv aod_template.py ${outfilename}_1_cfg.py
+#mv aod_template.py ${outfilename}_1_cfg.py
+
+#cmsRun ${outfilename}_1_cfg.py
+echo "1.) GENERATING AOD"
+cmsDriver.py step1 \
+    --filein file:${outfilename}_gensim.root --fileout file:${outfilename}_step1.root  \
+    --mc \
+    --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:@frozen2016 \
+    --eventcontent PREMIXRAW \
+    --datatier GEN-SIM-RAW \
+    --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
+    --era Run2_2016 \
+    --nThreads 1 \
+    --python_filename ${outfilename}_1_cfg.py \
+    --datamix PreMix \
+    --pileup_input "dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW" \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --no_exec -n ${nevent}
 
 cmsRun ${outfilename}_1_cfg.py
+
 echo "2.) GENERATING AOD"
 cmsDriver.py step2 \
     --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root \
@@ -147,7 +169,23 @@ cmsRun ${outfilename}_2_cfg.py
 #
 ###########
 ###########
-# Generate MiniAODv2
+# Generate MiniAODv3
+export SCRAM_ARCH=slc6_amd64_gcc630
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_9_4_9/src ] ; then 
+    echo release CMSSW_9_4_9 already exists
+else
+    scram p CMSSW CMSSW_9_4_9
+fi
+cd CMSSW_9_4_9/src
+eval `scram runtime -sh`
+scram b -j 1
+
+#scram p CMSSW_9_4_0
+#cd CMSSW_9_4_0/src
+#eval `scram runtime -sh`
+cd -
+
 echo "3.) Generating MINIAOD"
 cmsDriver.py step1 \
     --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root \
@@ -155,8 +193,8 @@ cmsDriver.py step1 \
     --step PAT \
     --eventcontent MINIAODSIM \
     --datatier MINIAODSIM \
-    --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    --era Run2_2016 \
+    --conditions 94X_mcRun2_asymptotic_v3 \
+    --era Run2_2016,run2_miniAOD_80XLegacy \
     --nThreads 1 \
     --python_filename ${outfilename}_miniaod_cfg.py \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
@@ -165,6 +203,47 @@ cmsDriver.py step1 \
 
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py
+
+#
+###########
+###########
+# Generate NanoAOD
+echo "4.) Generating NANOAOD"
+export SCRAM_ARCH=slc6_amd64_gcc700
+#scram p CMSSW CMSSW 10_2_10
+#cd CMSSW 10_2_10/src
+#git cms-merge-topic cms-nanoAOD:master-102X
+#git checkout -b nanoAOD cms-nanoAOD/master-102X
+#scram b -j 2
+#eval `scram runtime -sh`
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_10_2_11/src ] ; then 
+    echo release CMSSW_10_2_11 already exists
+else
+    scram p CMSSW CMSSW_10_2_11
+fi
+cd CMSSW_10_2_11/src
+eval `scram runtime -sh`
+scram b -j 1
+cd -
+
+#https://github.com/CoffeaTeam/CoffeaHarvester/blob/master/crab/mc_NANO_2016.py
+cmsDriver.py step1 \
+    --filein file:${outfilename}_miniaod.root --fileout file:${outfilename}_nanooad.root \
+    --mc \
+    --step NANO \
+    --eventcontent NANOAODSIM \
+    --datatier NANOAODSIM \
+    --conditions 102X_mcRun2_asymptotic_v6 \
+    --era Run2_2016,run2_nanoAOD_94X2016 \
+    --nThreads 1 \
+    --python_filename ${outfilename}_nanoaod_cfg.py \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' \
+    --no_exec -n ${nevent}
+
+#Run
+cmsRun ${outfilename}_nanoaod_cfg.py
 
 #
 ###########
@@ -179,7 +258,8 @@ tar xf $BASEDIR/inputs/copy.tar
 
 ls -lrht
 
-lcg-cp -v -D srmv2 -b file:///$PWD/${outfilename}_miniaod.root srm://t2-srm-02.lnl.infn.it:8443/srm/managerv2?SFN=/pnfs/lnl.infn.it/data/cms/store/user/shoh/privateSignal/${outfilename}_miniaod.root
+xrdcp file:///$PWD/${outfilename}_nanooad.root root://cmseos.fnal.gov//store/user/shoh/nanoaod/${PROCESS}/${outfilename}_nanoaod.root
+#lcg-cp -v -D srmv2 -b file:///$PWD/${outfilename}_miniaod.root srm://t2-srm-02.lnl.infn.it:8443/srm/managerv2?SFN=/pnfs/lnl.infn.it/data/cms/store/user/shoh/privateSignal/${outfilename}_miniaod.root
 
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
 #xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${EOSOUTPUT}/${PROCESS}/${outfilename}_miniaod.root
