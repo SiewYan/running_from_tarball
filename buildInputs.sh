@@ -46,7 +46,7 @@ echo "Tarring up submit..."
 tar -chzf submit.tgz submit 
 rm -r ${BASEDIR}/submit/inputs/*
 
-mv submit.tgz $SUBMIT_WORKDIR
+mv ${BASEDIR}/submit.tgz $SUBMIT_WORKDIR
 
 cp ${BASEDIR}/exec.sh $SUBMIT_WORKDIR
 
