@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export X509_USER_PROXY=${PWD}/x509up
+export X509_USER_PROXY=/homeui/hoh/x509up_u761
 export HOME=${PWD}
 
 tar xvaf submit.tgz

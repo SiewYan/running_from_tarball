@@ -10,6 +10,10 @@ ls -lhrt
 ############
 # inputs
 
+source /cvmfs/grid.cern.ch/emi3ui-latest/etc/profile.d/setup-ui-example.sh
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+unset LD_PRELOAD
+
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
@@ -124,6 +128,12 @@ sed -i 's/XX-GENSIM-XX/'${outfilename}'/g' aod_template.py
 sed -i 's/XX-AODFILE-XX/'${outfilename}'/g' aod_template.py
 
 mv aod_template.py ${outfilename}_1_cfg.py
+
+export X509_USER_PROXY=/homeui/hoh/x509up_u761
+echo "Check Proxy --> HERE:"
+voms-proxy-info
+which voms-proxy-info
+echo "PROXY --> ${X509_USER_PROXY}"
 
 cmsRun ${outfilename}_1_cfg.py
 echo "2.) GENERATING AOD"
