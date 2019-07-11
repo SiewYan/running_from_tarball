@@ -43,11 +43,13 @@ cp ~/x509up_u$UID $SUBMIT_WORKDIR/x509up
 
 #creating tarball
 echo "Tarring up submit..."
-tar -chzf submit.tgz submit 
+#tar -chzvf submit.tgz submit 
+tar -zcvf submit.tgz submit
 rm -r ${BASEDIR}/submit/inputs/*
 
+echo "mv ${BASEDIR}/submit.tgz $SUBMIT_WORKDIR"
 mv ${BASEDIR}/submit.tgz $SUBMIT_WORKDIR
-
+echo "cp ${BASEDIR}/exec.sh $SUBMIT_WORKDIR"
 cp ${BASEDIR}/exec.sh $SUBMIT_WORKDIR
 
 #does everything look okay?
